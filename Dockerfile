@@ -4,8 +4,6 @@ USER root
 
 RUN git clone --single-branch -b master https://github.com/mathieuboudreau/fsleyes-docker.git; 
 
-RUN apt-get update && apt-get install -y fsl python-numpy
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 #----------------------------------------------------------
