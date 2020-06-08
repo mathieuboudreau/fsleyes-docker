@@ -1,4 +1,4 @@
-FROM continuumio/anaconda:2019.10
+FROM jupyter/base-notebook:8ccdfc1da8d5
 
 USER root
 
