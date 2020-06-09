@@ -4,6 +4,44 @@ MAINTAINER Soichi Hayashi <hayashis@iu.edu>
 #install deps
 RUN apt-get update && apt-get install -y wget jq vim
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        build-essential=12.4ubuntu1 \
+        emacs \
+        git \
+        inkscape \
+        jed \
+        libsm6 \
+        libxext-dev \
+        libxrender1 \
+        lmodern \
+        netcat \
+        unzip \
+        nano \
+        curl \
+        wget \
+        gfortran \
+        cmake \
+        bsdtar  \
+        rsync \
+        imagemagick \
+        gnuplot-x11 \
+        libopenblas-base \
+        octave \
+        liboctave-dev  \
+        octave-info \
+        octave-parallel \
+        octave-struct \
+        octave-io \
+        octave-statistics \
+        octave-optim \
+        octave-image \
+        python3-dev \
+        ttf-dejavu && \
+    apt-get clean && \
+    apt-get autoremove && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 #install neurodebian
 RUN wget -O- http://neuro.debian.net/lists/xenial.us-tn.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
 RUN apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
