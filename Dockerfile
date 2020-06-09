@@ -32,3 +32,11 @@ RUN ldconfig && mkdir -p /N/u /N/home /N/dc2 /N/soft
 
 #https://wiki.ubuntu.com/DashAsBinSh
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+RUN apt-get update && apt-get -y update
+RUN apt-get install -y build-essential python3.6 python3-pip python3-dev
+RUN pip3 -q install pip –upgrade
+
+RUN pip3 install jupyter
+
+CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
