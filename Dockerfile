@@ -74,6 +74,6 @@ RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 RUN apt-get update && apt-get -y update
 
-RUN pip install jupyter
+RUN pip install setuptools jupyter
 
 CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
