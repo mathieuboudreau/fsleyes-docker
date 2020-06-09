@@ -2,7 +2,7 @@ FROM ubuntu:xenial
 MAINTAINER Soichi Hayashi <hayashis@iu.edu>
 
 #install deps
-RUN apt-get update && apt-get install -y wget jq vim python-pip
+RUN apt-get update && apt-get install -y wget jq vim python-pip python3 python3-pip
 
 #install neurodebian
 RUN wget -O- http://neuro.debian.net/lists/xenial.us-tn.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
@@ -50,6 +50,5 @@ USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
-RUN apt-get install python3 python3-pip
 RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache-dir notebook==5.*
