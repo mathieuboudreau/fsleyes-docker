@@ -4,6 +4,7 @@ USER root
 
 RUN git clone --single-branch -b master https://github.com/mathieuboudreau/fsleyes-docker.git; 
 RUN wget -O- http://neuro.debian.net/lists/precise.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list;\
+    sudo apt-key adv --recv-keys --keyserver pgp.mit.edu 2649A5A9;\
     sudo apt-get update; \
     sudo apt-get install fsl-complete;
 
