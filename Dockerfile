@@ -1,8 +1,8 @@
-FROM jupyter/base-notebook:8ccdfc1da8d5
+FROM ubuntu:xenial
 MAINTAINER Soichi Hayashi <hayashis@iu.edu>
 
 #install deps
-RUN apt-get update && apt-get install -y wget jq vim
+RUN apt-get update && apt-get install -y wget jq vim python-pip
 
 #install neurodebian
 RUN wget -O- http://neuro.debian.net/lists/xenial.us-tn.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
@@ -32,3 +32,22 @@ RUN ldconfig && mkdir -p /N/u /N/home /N/dc2 /N/soft
 
 #https://wiki.ubuntu.com/DashAsBinSh
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ENV USER ${NB_USER}
+ENV NB_UID ${NB_UID}
+ENV HOME /home/${NB_USER}
+
+RUN adduser --disabled-password \
+    --gecos "Default user" \
+    --uid ${NB_UID} \
+    ${NB_USER}
+
+# Make sure the contents of our repo are in ${HOME}
+COPY . ${HOME}
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+USER ${NB_USER}
+
+RUN pip install --no-cache-dir notebook==5.*
