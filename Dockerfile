@@ -1,4 +1,12 @@
-FROM ubuntu:xenial
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# Ubuntu 18.04 (bionic)
+# https://hub.docker.com/_/ubuntu/?tab=tags&name=bionic
+# OS/ARCH: linux/amd64
+ARG ROOT_CONTAINER=ubuntu:bionic-20200403@sha256:b58746c8a89938b8c9f5b77de3b8cf1fe78210c696ab03a1442e235eea65d84f
+ARG BASE_CONTAINER=$ROOT_CONTAINER
+FROM $BASE_CONTAINER
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 ARG NB_USER="jovyan"
@@ -63,71 +71,6 @@ ARG PYTHON_VERSION=default
 RUN mkdir /home/$NB_USER/work && \
     fix-permissions /home/$NB_USER
 
-#install deps
-RUN apt-get update && apt-get install -y wget jq vim
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        emacs \
-        git \
-        inkscape \
-        jed \
-        libsm6 \
-        libxext-dev \
-        libxrender1 \
-        lmodern \
-        netcat \
-        unzip \
-        nano \
-        curl \
-        wget \
-        gfortran \
-        cmake \
-        bsdtar  \
-        rsync \
-        imagemagick \
-        gnuplot-x11 \
-        libopenblas-base \
-        octave \
-        python-pip \
-        liboctave-dev  \
-        octave-info \
-        octave-parallel \
-        octave-struct \
-        octave-io \
-        octave-statistics \
-        octave-optim \
-        octave-image \
-        python3-dev \
-        ttf-dejavu && \
-    apt-get clean && \
-    apt-get autoremove && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-#install neurodebian
-RUN wget -O- http://neuro.debian.net/lists/xenial.us-tn.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
-RUN apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
-
-#install fsl
-RUN apt-get update && apt-get install -y fsl python-numpy
-
-ENV FSLDIR=/usr/share/fsl/5.0
-ENV PATH=$PATH:$FSLDIR/bin
-ENV LD_LIBRARY_PATH=/usr/lib/fsl/5.0:/usr/share/fsl/5.0/bin
-
-#simulate . ${FSLDIR}/etc/fslconf/fsl.sh
-ENV FSLBROWSER=/etc/alternatives/x-www-browser
-ENV FSLCLUSTER_MAILOPTS=n
-ENV FSLLOCKDIR=
-ENV FSLMACHINELIST=
-ENV FSLMULTIFILEQUIT=TRUE
-ENV FSLOUTPUTTYPE=NIFTI_GZ
-ENV FSLREMOTECALL=
-ENV FSLTCLSH=/usr/bin/tclsh
-ENV FSLWISH=/usr/bin/wish
-ENV POSSUMDIR=/usr/share/fsl/5.0
-
 # Install conda as jovyan and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION=4.8.2 \
     MINICONDA_MD5=87e77f097f6ebb5127c77662dfc3165e \
@@ -183,3 +126,46 @@ EXPOSE 8888
 # Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
 CMD ["start-notebook.sh"]
+
+# Copy local files as late as possible to avoid cache busting
+COPY start.sh start-notebook.sh start-singleuser.sh /usr/local/bin/
+COPY jupyter_notebook_config.py /etc/jupyter/
+
+# Fix permissions on /etc/jupyter as root
+USER root
+RUN fix-permissions /etc/jupyter/
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER $NB_UID
+
+#install deps
+RUN apt-get update && apt-get install -y wget jq vim
+
+#install neurodebian
+RUN wget -O- http://neuro.debian.net/lists/xenial.us-tn.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
+RUN apt-key adv --recv-keys --keyserver hkp://pool.sks-keyservers.net:80 0xA5D32F012649A5A9
+
+#install fsl
+RUN apt-get update && apt-get install -y fsl python-numpy
+
+ENV FSLDIR=/usr/share/fsl/5.0
+ENV PATH=$PATH:$FSLDIR/bin
+ENV LD_LIBRARY_PATH=/usr/lib/fsl/5.0:/usr/share/fsl/5.0/bin
+
+#simulate . ${FSLDIR}/etc/fslconf/fsl.sh
+ENV FSLBROWSER=/etc/alternatives/x-www-browser
+ENV FSLCLUSTER_MAILOPTS=n
+ENV FSLLOCKDIR=
+ENV FSLMACHINELIST=
+ENV FSLMULTIFILEQUIT=TRUE
+ENV FSLOUTPUTTYPE=NIFTI_GZ
+ENV FSLREMOTECALL=
+ENV FSLTCLSH=/usr/bin/tclsh
+ENV FSLWISH=/usr/bin/wish
+ENV POSSUMDIR=/usr/share/fsl/5.0
+
+#make it work under singularity
+RUN ldconfig && mkdir -p /N/u /N/home /N/dc2 /N/soft
+
+#https://wiki.ubuntu.com/DashAsBinSh
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
