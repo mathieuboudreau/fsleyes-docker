@@ -34,8 +34,8 @@ RUN ldconfig && mkdir -p /N/u /N/home /N/dc2 /N/soft
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 RUN apt-get update && apt-get -y update
-RUN pip3 -q install pip –upgrade
+RUN pip -q install pip –upgrade
 
-RUN pip3 install jupyter
+RUN pip install jupyter
 
 CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
