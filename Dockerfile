@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y wget jq vim
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential=12.4ubuntu1 \
+        build-essential \
         emacs \
         git \
         inkscape \
