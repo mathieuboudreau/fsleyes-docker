@@ -1,5 +1,4 @@
 FROM ubuntu:xenial
-MAINTAINER Soichi Hayashi <hayashis@iu.edu>
 
 #install deps
 RUN apt-get update && apt-get install -y wget jq vim
@@ -77,4 +76,4 @@ RUN pip install --upgrade pip
 RUN pip install setuptools 
 RUN pip install jupyter
 
-CMD ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
+ENTRYPOINT ["jupyter", "notebook", "--port=8888", "--no-browser", "--ip=0.0.0.0", "--allow-root"]
